@@ -1,0 +1,59 @@
+
+# ==========================================
+# IT HELP DESK - .NET 10 + NEXT.JS
+# ==========================================
+
+# .NET - Compilaciones y archivos temporales
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+*.user
+*.suo
+*.cache
+
+# Visual Studio y VS Code
+.vs/
+.vscode/*
+!.vscode/extensions.json
+
+# Next.js / Node.js
+**/node_modules/
+**/.next/
+**/out/
+**/.turbo/
+**/coverage/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Variables de entorno y secretos
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Configuraciones locales privadas
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+**/appsettings.Production.json
+
+# Archivos de base de datos y respaldos
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+*.dump
+*.sql.gz
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.tmp
+*.temp
