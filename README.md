@@ -236,7 +236,41 @@ El proyecto incorpora las siguientes medidas:
 
 ## Capturas de pantalla
 
-*Pendiente: incorporar capturas del inicio de sesión y de los paneles de administrador, técnico y usuario.*
+### Inicio de sesión
+
+Autenticación de usuarios para acceder a las funcionalidades correspondientes a su rol.
+
+![Inicio de sesión](docs/screenshots/login.png)
+
+### Panel de administración
+
+Vista general del sistema con estadísticas sobre incidencias, estados, técnicos y usuarios.
+
+![Dashboard de administración](docs/screenshots/admin-dashboard.png)
+
+### Gestión de incidencias
+
+Listado de solicitudes con búsqueda, filtros por estado y prioridad, y acceso a los detalles.
+
+![Gestión de incidencias](docs/screenshots/admin-incidencias.png)
+
+### Panel del técnico
+
+Consulta de incidencias asignadas y seguimiento de su resolución.
+
+![Panel del técnico](docs/screenshots/tecnico-dashboard.png)
+
+### Panel del usuario
+
+Visualización de incidencias propias y acceso a la creación de nuevas solicitudes.
+
+![Panel del usuario](docs/screenshots/usuario-dashboard.png)
+
+### Detalle y seguimiento de incidencias
+
+Consulta de información del ticket, gestión de estados, historial de cambios y comentarios.
+
+![Detalle de incidencia](docs/screenshots/incidencia-detalle-1.png)
 
 ## Estado del proyecto
 
