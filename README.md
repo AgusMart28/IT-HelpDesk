@@ -226,6 +226,34 @@ docker compose up -d
 
 **Nota:** no utilizar `docker compose down -v` si se desea conservar la información almacenada.
 
+## Configuración inicial del administrador
+
+Por seguridad, el registro público crea cuentas con rol `Usuario`. Para acceder al panel administrativo en una instalación local de demostración, es necesario asignar manualmente el rol `Administrador` a una cuenta existente.
+
+### 1. Registrar un usuario
+
+Iniciar la aplicación en http://localhost:3000 y registrar una cuenta con un correo y una contraseña propios.
+
+### 2. Asignar el rol Administrador
+
+Desde PowerShell, en la carpeta principal del proyecto, ejecutar:
+
+```powershell
+'UPDATE "Usuarios" SET "Rol" = ''Administrador'' WHERE "Email" = ''admin@ejemplo.com'';' | docker compose exec -T db psql -U helpdesk -d helpdesk_db
+```
+
+Reemplazar `admin@ejemplo.com` por el correo de la cuenta registrada.
+
+El comando debe indicar `UPDATE 1`, lo que confirma que se actualizó una cuenta.
+
+### 3. Iniciar sesión nuevamente
+
+Cerrar la sesión actual y volver a iniciar sesión con la misma cuenta.
+
+El sistema generará un nuevo token JWT con el rol `Administrador`, permitiendo acceder al panel administrativo.
+
+**Advertencia:** este procedimiento está destinado exclusivamente a entornos locales de desarrollo o demostración. En producción, la asignación de privilegios administrativos debe realizarse mediante un mecanismo de aprovisionamiento seguro.
+
 ## Seguridad
 
 El proyecto incorpora las siguientes medidas:
