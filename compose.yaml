@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:17
+    container_name: helpdesk-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: helpdesk_db
+      POSTGRES_USER: helpdesk
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configurar POSTGRES_PASSWORD en .env}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - helpdesk-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helpdesk -d helpdesk_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./HelpDesk.Api
+      dockerfile: Dockerfile
+    image: helpdesk-api:1.0
+    container_name: helpdesk-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__HelpDeskConnection: "Host=db;Port=5432;Database=helpdesk_db;Username=helpdesk;Password=${POSTGRES_PASSWORD}"
+      Jwt__Key: ${JWT_KEY:?Configurar JWT_KEY en .env}
+      Jwt__Issuer: ${JWT_ISSUER:?Configurar JWT_ISSUER en .env}
+      Jwt__Audience: ${JWT_AUDIENCE:?Configurar JWT_AUDIENCE en .env}
+    ports:
+      - "127.0.0.1:5000:8080"
+
+  web:
+    build:
+      context: ./helpdesk-web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:5000
+    image: helpdesk-web:1.0
+    container_name: helpdesk-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+    ports:
+      - "127.0.0.1:3000:3000"
+
+volumes:
+  helpdesk-postgres-data:
+    name: helpdesk-postgres-data

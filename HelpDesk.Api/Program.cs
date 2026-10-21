@@ -101,6 +101,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Aplicar migraciones pendientes al iniciar la aplicación
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider
+        .GetRequiredService<HelpDeskDbContext>();
+
+    db.Database.Migrate();
+}
+
 
 if (app.Environment.IsDevelopment())
 {

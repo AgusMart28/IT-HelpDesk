@@ -39,13 +39,16 @@ Su objetivo es simular el funcionamiento de una mesa de ayuda (*Help Desk*) util
 - Protección de endpoints según los permisos del usuario.
 
 ### Administrador
-- Visualización y gestión de incidencias.
-- Búsqueda y filtrado de solicitudes.
-- Consulta de estadísticas.
-- Asignación y desasignación de técnicos.
-- Actualización de estados.
-- Consulta del historial de cambios.
+
+- Visualización de estadísticas generales del sistema.
+- Consulta, búsqueda y filtrado de incidencias.
+- Asignación y desasignación de técnicos a incidencias.
+- Actualización de estados y consulta del historial de cambios.
 - Lectura y publicación de comentarios.
+- Registro, edición y eliminación de técnicos.
+- Creación de cuentas de acceso para técnicos.
+- Vinculación automática de las cuentas creadas con sus registros de técnicos.
+- Control de acceso a las funciones administrativas mediante autorización por roles.
 
 ### Técnico
 - Visualización de incidencias asignadas.
@@ -134,91 +137,94 @@ IT-HelpDesk/
 |-- README.md
 ```
 
-## Requisitos para ejecutar el proyecto
+## Instalación y ejecución con Docker
 
-- .NET 10 SDK
-- Node.js y npm compatibles con Next.js 16
-- PostgreSQL
-- Git
+El proyecto está preparado para ejecutarse localmente mediante **Docker Compose**, que permite iniciar el frontend, la API REST y PostgreSQL sin instalar cada tecnología por separado.
 
-## Configuración del backend
+### Requisitos
 
-1. Clonar el repositorio:
+- Git.
+- Docker Desktop con Docker Compose.
 
-```bash
-git clone URL_DEL_REPOSITORIO
-cd IT-HelpDesk/HelpDesk.Api
-```
-
-2. Configurar las credenciales mediante **.NET User Secrets**:
+### 1. Clonar el repositorio
 
 ```bash
-dotnet user-secrets init
+git clone https://github.com/AgusMart28/IT-HelpDesk.git
+cd IT-HelpDesk
 ```
 
-Configurar la cadena de conexión a PostgreSQL y los parámetros JWT:
+### 2. Configurar las variables de entorno
+
+Crear un archivo `.env` a partir de `.env.example`.
+
+En PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Editar `.env` y configurar los siguientes valores:
+
+- `POSTGRES_PASSWORD`: contraseña segura para PostgreSQL.
+- `JWT_KEY`: clave secreta aleatoria para firmar los tokens JWT.
+- `JWT_ISSUER`: identificador del emisor de los tokens.
+- `JWT_AUDIENCE`: identificador del destinatario de los tokens.
+
+Para generar una clave JWT aleatoria de 64 bytes codificada en Base64, se puede utilizar PowerShell:
+
+```powershell
+$bytes = New-Object byte[] 64
+[System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+[Convert]::ToBase64String($bytes)
+```
+
+Copiar el valor generado en `JWT_KEY` dentro de `.env`.
+
+**Importante:** nunca publicar el archivo `.env` ni utilizar contraseñas reales en archivos versionados.
+
+### 3. Iniciar los servicios
+
+Desde la carpeta principal del proyecto:
 
 ```bash
-dotnet user-secrets set "ConnectionStrings:HelpDeskConnection" "Host=localhost;Port=5432;Database=helpdesk_db;Username=TU_USUARIO;Password=TU_PASSWORD"
-dotnet user-secrets set "Jwt:Issuer" "HelpDeskApi"
-dotnet user-secrets set "Jwt:Audience" "HelpDeskFrontend"
+docker compose up -d --build
 ```
 
-Generar una clave aleatoria de al menos 32 bytes y codificarla en Base64. Guardar el valor mediante:
+Docker Compose construirá e iniciará los siguientes servicios:
 
-```bash
-dotnet user-secrets set "Jwt:Key" "TU_CLAVE_BASE64"
-```
+| Servicio | Dirección local |
+|---|---|
+| Frontend Next.js | http://localhost:3000 |
+| API REST ASP.NET Core | http://localhost:5000 |
+| PostgreSQL | localhost:5433 |
 
-**Importante:** las credenciales y las claves JWT no deben publicarse en el repositorio. Los valores de emisor y audiencia deben ser coherentes con la configuración utilizada para generar los tokens.
+La API utiliza Entity Framework Core para aplicar automáticamente las migraciones pendientes al iniciar.
 
-3. Restaurar dependencias:
+### 4. Acceder a la aplicación
 
-```bash
-dotnet restore
-```
-
-4. Aplicar las migraciones:
-
-```bash
-dotnet ef database update
-```
-
-5. Ejecutar la API:
-
-```bash
-dotnet run --urls "http://localhost:5000"
-```
-
-## Configuración del frontend
-
-1. Acceder a la carpeta:
-
-```bash
-cd helpdesk-web
-```
-
-2. Instalar dependencias:
-
-```bash
-npm install
-```
-
-3. Crear un archivo `.env.local` con el siguiente contenido:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
-```
-
-4. Ejecutar el servidor de desarrollo:
-
-```bash
-npm run dev
-```
-
-5. Abrir en el navegador:
+Abrir en el navegador:
 
 http://localhost:3000
+
+Se puede registrar una cuenta de usuario desde la interfaz de inicio.
+
+Las funciones administrativas requieren una cuenta con rol `Administrador`. Por seguridad, el registro público no permite asignarse privilegios administrativos.
+
+### 5. Detener los servicios
+
+```bash
+docker compose down
+```
+
+Este comando detiene y elimina los contenedores, pero conserva los datos almacenados en el volumen de PostgreSQL.
+
+Para volver a iniciar la aplicación:
+
+```bash
+docker compose up -d
+```
+
+**Nota:** no utilizar `docker compose down -v` si se desea conservar la información almacenada.
 
 ## Seguridad
 
@@ -274,17 +280,24 @@ Consulta de información del ticket, gestión de estados, historial de cambios y
 
 ## Estado del proyecto
 
-**Versión funcional en desarrollo.**
+**Versión funcional para demostración y portfolio.**
 
-Las principales funcionalidades de los tres roles están implementadas y conectadas con la API REST y PostgreSQL.
+El sistema integra una aplicación web desarrollada con Next.js, una API REST construida con ASP.NET Core y una base de datos PostgreSQL. Los tres servicios se ejecutan mediante Docker Compose.
 
-Próximas mejoras previstas:
+Se verificó manualmente el funcionamiento de los tres roles principales y el flujo completo de atención de incidencias:
 
-- Pruebas automatizadas.
-- Mejoras en la gestión de sesiones y seguridad.
-- Contenerización con Docker.
-- Despliegue de la aplicación.
-- Documentación adicional de endpoints.
+1. Un usuario registra una solicitud de soporte técnico.
+2. El administrador consulta la incidencia y la asigna a un técnico.
+3. El técnico inicia sesión y visualiza las incidencias asignadas.
+4. El técnico actualiza el estado de la solicitud y agrega comentarios.
+5. El usuario puede consultar el seguimiento de su incidencia.
+
+### Mejoras futuras
+
+- Incorporación de pruebas automatizadas.
+- Revisión adicional de seguridad y autorización.
+- Mejoras en la gestión de sesiones.
+- Despliegue en un entorno público.
 
 ## Autor
 

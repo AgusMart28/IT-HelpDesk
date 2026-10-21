@@ -155,8 +155,16 @@ export default function AdminPage() {
                     >
                         Incidencias
                     </button>
-                    <p className="px-4 py-2 text-slate-400">Técnicos</p>
-                    <p className="px-4 py-2 text-slate-400">Usuarios</p>
+                    <button
+                        onClick={() => router.push("/admin/tecnicos")}
+                        className="w-full rounded-lg px-4 py-2 text-left text-slate-300 hover:bg-slate-800 hover:text-white"
+                    >
+                        Técnicos
+                    </button>
+
+                    <p className="px-4 py-2 text-slate-400">
+                        Usuarios
+                    </p>
                 </nav>
 
                 <div className="mt-auto pt-10">
